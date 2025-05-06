@@ -2,10 +2,16 @@
   "name": "telegrambot",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "bot.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "devserver": "nodemon bot.js"
+    "devserver": "nodemon bot.js",
+    "start": "node bot.js",
+    "build": "tsc",
+    "build:dev": "tsc --watch",
+    "build:prod": "tsc --watch --sourceMap false",
+    "build:prod:dev": "tsc --watch --sourceMap false --outDir ./dist",
+    "build:prod:dev:prod": "tsc --watch --sourceMap false --outDir ./dist --removeComments"
   },
   "author": "",
   "license": "ISC",
