@@ -1,8 +1,11 @@
 require('dotenv').config();
+const express = require('express');
 const { Telegraf, session } = require('telegraf');
 const { message } = require('telegraf/filters');
 
 const bot = new Telegraf(process.env.BOT_TOKEN);
+const app = express();
+const PORT = process.env.PORT || 3000;
 
 // Usar sesión simple
 bot.use(session());
@@ -134,8 +137,18 @@ function getChineseZodiac(date) {
     return animals[year % 12];
 }
 
-// Lanzar el bot
-bot.launch();
+// Configurar webhook
+app.use(express.json());
+app.post(`/webhook/${process.env.BOT_TOKEN}`, (req, res) => {
+    bot.handleUpdate(req.body);
+    res.sendStatus(200);
+});
+
+// Iniciar servidor
+app.listen(PORT, () => {
+    console.log(`Servidor escuchando en el puerto ${PORT}`);
+    console.log(`Establece el webhook en Telegram con la URL: https://<your-domain>/webhook/${process.env.BOT_TOKEN}`);
+});
 
 // Capturar errores
 process.once('SIGINT', () => bot.stop('SIGINT'));
