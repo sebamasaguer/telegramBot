@@ -147,7 +147,7 @@ app.post(`/webhook/${process.env.BOT_TOKEN}`, (req, res) => {
 // Iniciar servidor
 app.listen(PORT, () => {
     console.log(`Servidor escuchando en el puerto ${PORT}`);
-    console.log(`Establece el webhook en Telegram con la URL: https://<your-domain>/webhook/${process.env.BOT_TOKEN}`);
+    console.log(`Establece el webhook en Telegram con la URL: https://telegram-bot-gules-six.vercel.app/webhook/${process.env.BOT_TOKEN}`);
 });
 
 // Capturar errores

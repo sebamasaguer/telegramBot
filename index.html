@@ -1,10 +1,56 @@
-<script>
-    require("child_process").exec("node bot.js", function (error, stdout, stderr) {
-        if (error) {
-            console.error(`exec error: ${error}`);
-            return;
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conoce tu Número Mágico</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            color: #fff;
+            text-align: center;
         }
-        console.log(`stdout: ${stdout}`);
-        console.log(`stderr: ${stderr}`);
-    });
-</script>
+        .container {
+            padding: 50px 20px;
+        }
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+        p {
+            font-size: 1.2em;
+            margin-bottom: 30px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            color: #fff;
+            background-color: #ff6f61;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        .btn:hover {
+            background-color: #ff3b2f;
+        }
+        footer {
+            margin-top: 50px;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Descubre tu Número Mágico</h1>
+        <p>Conéctate con nuestro bot de numerología y encuentra el número que define tu esencia. ¡Es fácil y divertido!</p>
+        <a href="https://t.me/tuBotNumerologia" class="btn" target="_blank">Conéctate Ahora</a>
+    </div>
+    <footer>
+        <p>© 2023 Numerología Mágica. Todos los derechos reservados.</p>
+    </footer>
+</body>
+</html>
