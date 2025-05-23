@@ -25,19 +25,21 @@ bot.command('start', ctx => {
 // Función para enviar mensaje inicial
 function sendInitialMessage(ctx) {
     ctx.session = {}; // resetear sesión
-    const initialMessage = "Hola 👋, ¿qué número mágico deseas calcular?\n\n1. Mi número mágico (por tu fecha de nacimiento)\n2. Número mágico del día de hoy 📅";
+    const initialMessage = "Hola 👋\n*¡Bienvenido! Soy tu experto en numerología.*\nTe acompañaré a descubrir los secretos que los números tienen para ti.\n ¡Vamos a comenzar!\n\n¿Qué deseas calcular?\n\n1. Mi número mágico (por tu fecha de nacimiento)\n2. Número mágico del día de hoy 📅\n3. Mi número pitagórico (por tu nombre)";
     ctx.reply(initialMessage, {
         reply_markup: {
             inline_keyboard: [
                 [
                     { text: "🎂 Mi número mágico", callback_data: "mi_numero_magico" },
                     { text: "📅 Número mágico del día", callback_data: "numero_dia" }
+                ],
+                [
+                    { text: "🔤 Mi número pitagórico", callback_data: "numero_pitagorico" }
                 ]
             ]
         }
     });
 }
-
 // Características de cada número según la numerología
 const numerologyDescriptions = {
     1: "Líder, independiente, innovador y con gran fuerza de voluntad. Los nacidos bajo el número 1 suelen ser pioneros y tener iniciativa.",
@@ -66,7 +68,6 @@ function getDayAnalysis(number) {
     };
     return dayAnalyses[number] || "";
 }
-
 // Manejo de callback_query
 bot.on('callback_query', async (ctx) => {
     const action = ctx.callbackQuery.data;
@@ -82,6 +83,10 @@ bot.on('callback_query', async (ctx) => {
         const analysis = getDayAnalysis(magicNumber);
         await ctx.reply(`El número mágico del día de hoy (${formattedDate}) es: *${magicNumber}* ✨\n\n${analysis}`, { parse_mode: "Markdown" });
         sendAnotherQuery(ctx);
+    }
+    else if (action === "numero_pitagorico") {
+        await ctx.reply("Por favor, escribe tu nombre completo:");
+        ctx.session.waitingForName = true;
     }
     else if (action === "consultar_otro") {
         sendInitialMessage(ctx);
@@ -102,7 +107,7 @@ bot.on(message('text'), async (ctx) => {
             const zodiacSign = getZodiacSign(userMessage);
             const chineseSign = getChineseZodiac(userMessage);
             const description = numerologyDescriptions[magicNumber] || "";
-            await ctx.reply(
+           await ctx.reply(
                 `🎉 Tu número mágico es: *${magicNumber}*\n${description}\n\n♈ Tu signo del zodiaco es: *${zodiacSign}*\n🐉 Tu animal del horóscopo chino es: *${chineseSign}*`,
                 { parse_mode: "Markdown" }
             );
@@ -111,6 +116,15 @@ bot.on(message('text'), async (ctx) => {
         } else {
             await ctx.reply("⚠️ Fecha inválida. Por favor, escribe la fecha en formato correcto DD/MM/AAAA (por ejemplo 23/08/1995).");
         }
+    } else if (ctx.session && ctx.session.waitingForName) {
+        const name = userMessage;
+        const pitagoricNumber = calculatePythagoreanNumber(name);
+        const reference = getPythagoreanReference(pitagoricNumber);
+        await ctx.reply(`🔢 El número pitagórico de tu nombre es: *${pitagoricNumber}*\n\n${reference}`, {
+            parse_mode: "Markdown"
+        });
+        ctx.session.waitingForName = false;
+        sendAnotherQuery(ctx);
     }
 });
 
@@ -166,10 +180,46 @@ function getChineseZodiac(date) {
     return animals[year % 12];
 }
 
+// Función para calcular el número pitagórico de un nombre
+function calculatePythagoreanNumber(name) {
+    // Mapeo pitagórico: A=1, B=2, ..., I=9, J=1, ..., R=9, S=1, ..., Z=8
+    const map = {
+        A:1, B:2, C:3, D:4, E:5, F:6, G:7, H:8, I:9,
+        J:1, K:2, L:3, M:4, N:5, O:6, P:7, Q:8, R:9,
+        S:1, T:2, U:3, V:4, W:5, X:6, Y:7, Z:8
+    };
+    const letters = name.toUpperCase().replace(/[^A-Z]/g, '').split('');
+    let sum = letters.reduce((acc, letter) => acc + (map[letter] || 0), 0);
+    while (sum >= 10 && sum !== 11 && sum !== 22 && sum !== 33) {
+        sum = sum.toString().split('').reduce((acc, digit) => acc + parseInt(digit), 0);
+    }
+    return sum;
+}
+
+// Función para obtener la referencia del número pitagórico
+function getPythagoreanReference(number) {
+    const references = {
+        1: "El número 1 representa liderazgo, independencia y originalidad.",
+        2: "El número 2 simboliza cooperación, sensibilidad y diplomacia.",
+        3: "El número 3 está asociado a creatividad, comunicación y optimismo.",
+        4: "El número 4 indica estabilidad, trabajo duro y organización.",
+        5: "El número 5 es libertad, aventura y adaptabilidad.",
+        6: "El número 6 representa responsabilidad, armonía y servicio.",
+        7: "El número 7 es introspección, análisis y espiritualidad.",
+        8: "El número 8 simboliza poder, éxito material y ambición.",
+        9: "El número 9 es generosidad, compasión y humanitarismo.",
+        11: "El número maestro 11 es intuición, inspiración y visión.",
+        22: "El número maestro 22 es construcción, realización y liderazgo global.",
+        33: "El número maestro 33 es maestría, amor universal y enseñanza."
+    };
+    return references[number] || "No hay referencia disponible para este número.";
+}
+
 // Lanzar el bot
 bot.launch();
 
 // Capturar errores
 process.once('SIGINT', () => bot.stop('SIGINT'));
 process.once('SIGTERM', () => bot.stop('SIGTERM'));
+
 
