@@ -38,6 +38,35 @@ function sendInitialMessage(ctx) {
     });
 }
 
+// Características de cada número según la numerología
+const numerologyDescriptions = {
+    1: "Líder, independiente, innovador y con gran fuerza de voluntad. Los nacidos bajo el número 1 suelen ser pioneros y tener iniciativa.",
+    2: "Cooperativo, diplomático, sensible y pacífico. El número 2 destaca por su capacidad para trabajar en equipo y su empatía.",
+    3: "Creativo, comunicativo, optimista y sociable. El 3 es expresivo y disfruta de la vida social y artística.",
+    4: "Práctico, organizado, trabajador y confiable. El número 4 representa la estabilidad y el esfuerzo constante.",
+    5: "Aventurero, versátil, curioso y amante de la libertad. El 5 busca cambios y nuevas experiencias.",
+    6: "Responsable, protector, amoroso y orientado a la familia. El 6 se preocupa por el bienestar de los demás.",
+    7: "Analítico, introspectivo, espiritual y amante del conocimiento. El 7 busca la verdad y la sabiduría.",
+    8: "Ambicioso, eficiente, con visión de negocios y capacidad de liderazgo. El 8 está relacionado con el éxito material.",
+    9: "Humanitario, generoso, compasivo y altruista. El 9 se orienta al servicio y la ayuda a los demás."
+};
+
+// Análisis del número mágico del día
+function getDayAnalysis(number) {
+    const dayAnalyses = {
+        1: "Hoy es un día ideal para iniciar proyectos, tomar decisiones y liderar. Aprovecha la energía para avanzar con determinación.",
+        2: "Día para colaborar, escuchar y buscar acuerdos. La diplomacia y la paciencia serán tus mejores aliados.",
+        3: "La creatividad y la comunicación fluirán. Expresa tus ideas y disfruta de actividades sociales.",
+        4: "Enfócate en la organización y el trabajo constante. Es un buen momento para poner orden y cumplir responsabilidades.",
+        5: "Día de cambios, movimiento y nuevas oportunidades. Mantente abierto a lo inesperado.",
+        6: "Dedica tiempo a la familia y a cuidar de los demás. La armonía y el apoyo mutuo serán importantes.",
+        7: "Reflexiona, estudia y busca momentos de introspección. Es un día para el crecimiento personal.",
+        8: "Enfócate en tus metas materiales y profesionales. La disciplina te acercará al éxito.",
+        9: "Jornada para ayudar, perdonar y cerrar ciclos. Practica la generosidad y el desapego."
+    };
+    return dayAnalyses[number] || "";
+}
+
 // Manejo de callback_query
 bot.on('callback_query', async (ctx) => {
     const action = ctx.callbackQuery.data;
@@ -50,7 +79,8 @@ bot.on('callback_query', async (ctx) => {
         const today = new Date();
         const formattedDate = `${today.getDate().toString().padStart(2, '0')}/${(today.getMonth() + 1).toString().padStart(2, '0')}/${today.getFullYear()}`;
         const magicNumber = calculateMagicNumber(formattedDate);
-        await ctx.reply(`El número mágico del día de hoy (${formattedDate}) es: *${magicNumber}* ✨`, { parse_mode: "Markdown" });
+        const analysis = getDayAnalysis(magicNumber);
+        await ctx.reply(`El número mágico del día de hoy (${formattedDate}) es: *${magicNumber}* ✨\n\n${analysis}`, { parse_mode: "Markdown" });
         sendAnotherQuery(ctx);
     }
     else if (action === "consultar_otro") {
@@ -71,9 +101,11 @@ bot.on(message('text'), async (ctx) => {
             const magicNumber = calculateMagicNumber(userMessage);
             const zodiacSign = getZodiacSign(userMessage);
             const chineseSign = getChineseZodiac(userMessage);
-            await ctx.reply(`🎉 Tu número mágico es: *${magicNumber}*\n♈ Tu signo del zodiaco es: *${zodiacSign}*\n🐉 Tu animal del horóscopo chino es: *${chineseSign}*`, {
-                parse_mode: "Markdown"
-            });
+            const description = numerologyDescriptions[magicNumber] || "";
+            await ctx.reply(
+                `🎉 Tu número mágico es: *${magicNumber}*\n${description}\n\n♈ Tu signo del zodiaco es: *${zodiacSign}*\n🐉 Tu animal del horóscopo chino es: *${chineseSign}*`,
+                { parse_mode: "Markdown" }
+            );
             ctx.session.waitingForBirthday = false;
             sendAnotherQuery(ctx);
         } else {
@@ -140,5 +172,4 @@ bot.launch();
 // Capturar errores
 process.once('SIGINT', () => bot.stop('SIGINT'));
 process.once('SIGTERM', () => bot.stop('SIGTERM'));
-
 
